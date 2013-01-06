@@ -27,9 +27,9 @@ def activities():
     return render_template('nodes.html')
 
 
-@app.route('/map')
+@app.route('/lastfm')
 def map():
-    return render_template('map.html', title="MapOfGeorge")
+    return render_template('lastfm.html')
 
 
 if __name__ == '__main__':

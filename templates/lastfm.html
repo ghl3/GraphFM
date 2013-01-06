@@ -1,0 +1,32 @@
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+
+    <title>adrn | galaxy</title>
+
+    <!-- Style / css -->
+    <link href="http://fonts.googleapis.com/css?family=Carrois+Gothic" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="/static/style.css" />
+    <link rel="stylesheet" type="text/css" href="/static/galaxy.css" />
+
+    <!-- Javascript dependencies -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script type="text/javascript" src="/static/graph2.js"></script>
+  </head>
+
+  <body>
+    <script>
+      var neighbours=null;
+      var neigh_url = "http://ws.audioscrobbler.com/2.0/?method=user.getneighbours&user=rj&api_key=4ea86273090fac63525518c0a77465a4&format=json";
+      d3.json(neigh_url, function(json) {
+      console.log(json);
+      neighbours=json.neighbours;
+      
+      len = neighbours.user.length;
+      var idx = Math.floor(Math.random()*len);
+      console.log( neighbours.user[idx]);
+
+      });
+    </script>
