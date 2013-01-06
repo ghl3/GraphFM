@@ -8,6 +8,9 @@ function myGraph(svg) {
 
     var color = d3.scale.category20();
 
+    //var w = svg.width;
+    //var h = svg.height;
+
     // Add and remove elements on the graph object
     this.addNode = function(name, group) {
 	nodes.push({"name":name, "group":group});
@@ -80,7 +83,8 @@ function myGraph(svg) {
     var update = function () {
 	console.log("Update");
 
-        var link = vis.selectAll("line.link")
+	// vis
+        var link = svg.selectAll("line.link")
             .data(links, function(d) { return d.source.name + "-" + d.target.name; });
 
         link.enter().insert("line")
@@ -88,7 +92,8 @@ function myGraph(svg) {
 
         link.exit().remove();
 
-        var node = vis.selectAll("g.node")
+	// vis
+        var node = svg.selectAll("g.node")
             .data(nodes, function(d) { return d.name;});
 
         var nodeEnter = node.enter().append("g")
@@ -162,7 +167,7 @@ function myGraph(svg) {
 var w = 960; //$(el).innerWidth(),
 var h = 700; //$(el).innerHeight();
 
-var svg = this.vis = d3.select("body").append("svg:svg")
+var svg = d3.select("body").append("svg:svg")
     .attr("width", w)
     .attr("height", h);
 
