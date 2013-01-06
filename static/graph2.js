@@ -4,12 +4,9 @@
 
 function myGraph(svg) {
 
-    var self = this;
-
-    var color = d3.scale.category20();
-
-    //var w = svg.width;
-    //var h = svg.height;
+    //
+    // Public API
+    //
 
     // Add and remove elements on the graph object
     this.addNode = function(name, group) {
@@ -33,6 +30,14 @@ function myGraph(svg) {
 	update();
     }
 
+    // 
+    // Private Implementation
+    //
+
+    var self = this;
+
+    var color = d3.scale.category20();
+
     var findNode = function(name) {
 	for (var i in nodes) {if (nodes[i]["name"] === name) return nodes[i]};
     }
@@ -49,7 +54,6 @@ function myGraph(svg) {
 
     var nodes = force.nodes(),
     links = force.links();
-
 
     var makename = function() {
 	var text = "";
@@ -102,22 +106,11 @@ function myGraph(svg) {
 
         nodeEnter.append("circle")
             .attr("class", "circle")
-            //.attr("xlink:href", "https://d3nwyuy0nl342s.cloudfront.net/images/icons/public.png")
             .attr("r", 10)
             .style("fill", function(d) { return color(d.group); })
 	    .append("svg:title")
 	    .text(function(d) { return d.name; });
-//            .style("fill", function(d) { return color(Math.floor(Math.random()*21)); })
 
-	
-	/*
-        nodeEnter.append("text")
-            .attr("class", "nodetext")
-            .attr("dx", 12)
-            .attr("dy", ".35em")
-            .text(function(d) {return d.name});
-	*/
-	
 	// Make the ability to add new nodes
 	// by clicking
 	nodeEnter.on("click", function(d) {
@@ -125,24 +118,12 @@ function myGraph(svg) {
 	    var group = d.group;
 	    self.addNode(name, group);
 	    self.addLink(d.name, name);
-	    /*
-	    console.log(d.name)
-	    var new_name = d.name + "_Bob";
-	    nodes.push({"name":new_name, "group": d.group});
-	    links.push({"source":findNodeIndex(d.name), 
-			"target":findNodeIndex(new_name), "value": 1 });
-	    console.log( "Source: " + findNodeIndex(d.name));
-	    console.log( "Target: " + findNodeIndex(new_name));
-	    update();
-	    */
 	});
 	
-
 	//nodeEnter.on("mouseover", addLabel);
 	//nodeEnter.on("mouseout", clearLabel);
 
         node.exit().remove();
-
 
         force.on("tick", function() {
 	    link.attr("x1", function(d) { return d.source.x; })
@@ -159,29 +140,15 @@ function myGraph(svg) {
 
     // Make it all go
     begin();
-    //update();
 }
 
 
 // set up the D3 visualisation in the specified element
-var w = 960; //$(el).innerWidth(),
-var h = 700; //$(el).innerHeight();
+var w = 960;
+var h = 700;
 
 var svg = d3.select("body").append("svg:svg")
     .attr("width", w)
     .attr("height", h);
 
-
 graph = new myGraph(svg);
-//graph = new myGraph("body");
-// graph.begin();
-
-// You can do this from the console as much as you like...
-/*
-graph.addNode("Cause");
-graph.addNode("Effect");
-graph.addLink("Cause", "Effect");
-graph.addNode("A");
-graph.addNode("B");
-graph.addLink("A", "B");
-*/
