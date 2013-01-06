@@ -34,6 +34,9 @@ function myGraph(svg) {
     // Private Implementation
     //
 
+    var w = svg[0][0].getAttribute("width");
+    var h = svg[0][0].getAttribute("height");
+
     var self = this;
 
     var color = d3.scale.category20();
@@ -144,11 +147,11 @@ function myGraph(svg) {
 
 
 // set up the D3 visualisation in the specified element
-var w = 960;
-var h = 700;
+//var w = 960;
+//var h = 700;
 
 var svg = d3.select("body").append("svg:svg")
-    .attr("width", w)
-    .attr("height", h);
+    .attr("width", 960)
+    .attr("height", 700);
 
 graph = new myGraph(svg);
