@@ -2,7 +2,7 @@
 // Based on:
 // http://stackoverflow.com/questions/9539294/adding-new-nodes-to-force-directed-layout
 
-function myGraph(svg) {
+function myGraph(svg, initial_nodes, initial_links) {
 
     //
     // Public API
@@ -71,6 +71,14 @@ function myGraph(svg) {
     var begin = function() {
 	console.log("Begin");
 
+	
+	for(var i=0; i < initial_nodes.length; ++i) {
+	    nodes.push(initial_nodes[i]);
+	}
+	for(var i=0; i < initial_links.length; ++i) {
+	    links.push(initial_links[i]);
+	}
+	/*
 	// Get the JSON
 	d3.json('/static/miserables.json', function(error, json) {
 
@@ -84,7 +92,8 @@ function myGraph(svg) {
 	    // Now, update
 	    update();
 	});
-
+*/
+	update();
     }
 
     var update = function () {
@@ -149,9 +158,10 @@ function myGraph(svg) {
 // set up the D3 visualisation in the specified element
 //var w = 960;
 //var h = 700;
-
+/*
 var svg = d3.select("body").append("svg:svg")
     .attr("width", 960)
     .attr("height", 700);
 
 graph = new myGraph(svg);
+*/
