@@ -1,113 +1,167 @@
 
-var width = 960;
-var height = 500;
+// Based on:
+// http://stackoverflow.com/questions/9539294/adding-new-nodes-to-force-directed-layout
 
-var color = d3.scale.category20();
+function myGraph(svg, initial_nodes, initial_links) {
 
-// Create the 'force' properties
-// that controls the motion of the nodes
-var force = d3.layout.force()
-    .charge(-120)
-    .linkDistance(30)
-    .size([width, height]);
+    //
+    // Public API
+    //
 
-var svg = d3.select("body").append("svg")
-    .attr("width", width)
-    .attr("height", height);
+    // Add and remove elements on the graph object
+    this.addNode = function(name, group) {
+	nodes.push({"name":name, "group":group});
+	update();
+    }
 
-var graph = null;
+    this.removeNode = function(name) {
+	var i = 0;
+	var n = findNode(name);
+	while (i < links.length) {
+	    if ((links[i]['source'] == n)||(links[i]['target'] == n)) links.splice(i,1);
+	    else i++;
+	}
+	nodes.splice(findNodeIndex(name),1);
+	update();
+    }
 
-function begin() {
+    this.addLink = function (source, target) {
+	links.push({"source":findNode(source),"target":findNode(target)});
+	update();
+    }
 
-    // 'Use the Force'
-    // Bind it to the nodes and
-    // their connecting lines
-    force
-        .nodes(d3.values(graph.nodes))
-        .links(d3.values(graph.links))
-        .start();
-}
+    // 
+    // Private Implementation
+    //
 
-function update() {
+    var w = svg[0][0].getAttribute("width");
+    var h = svg[0][0].getAttribute("height");
 
-    force.stop();
+    var self = this;
 
-    // To ensure that the 'force' is concurrent,
-    // we reference the nodes and links from the force
-    var nodes = force.nodes();
-    var links = force.links();
+    var color = d3.scale.category20();
 
-    /*
-    // Some helper functions
     var findNode = function(name) {
 	for (var i in nodes) {if (nodes[i]["name"] === name) return nodes[i]};
     }
-    */
-
-    var link = svg.selectAll("line.link")
-        .data(links)
-        .enter().append("line")
-        .attr("class", "link")
-        .style("stroke-width", function(d) { return Math.sqrt(d.value); });
-
-    var node = svg.selectAll("circle.node")
-        .data(nodes)
-        .enter().append("circle")
-        .attr("class", "node")
-        .attr("r", 10)
-	//.attr("x", "-8px")
-        //.attr("y", "-8px")
-        .style("fill", function(d) { return color(d.group); })
-        .call(force.drag);
-
-    node
-	.append("title")
-        .text(function(d) { return d.name; });
-
-    // Make the nodes 'clickable'
+    
     var findNodeIndex = function(name) {
-	for (var i in nodes) {
-	    if(nodes[i]["name"] === name) return i;
-	}
+        for (var i in nodes) {if (nodes[i]["name"] === name) return i};
     }
 
-    // Set the force to listen for dragging
-    // and to respond by moving the lines
-    // and the nodes
-    force.on("tick", function() {
-        link.attr("x1", function(d) { return d.source.x; })
-            .attr("y1", function(d) { return d.source.y; })
-            .attr("x2", function(d) { return d.target.x; })
-            .attr("y2", function(d) { return d.target.y; });
+    var force = d3.layout.force()
+        .gravity(.05)
+        .distance(100)
+        .charge(-100)
+        .size([w, h]);
+
+    var nodes = force.nodes(),
+    links = force.links();
+
+    var makename = function() {
+	var text = "";
+	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 	
-	node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
-        //node.attr("cx", function(d) { return d.x; })
-        //    .attr("cy", function(d) { return d.y; });
-    });
+	for( var i=0; i < 5; i++ )
+	    text += possible.charAt(Math.floor(Math.random() * possible.length));
+	
+	return text;
+    }
 
-    // Make the ability to add new nodes
-    // by clicking
-    node.on("click", function(d) {
-	console.log(d.name)
-	var new_name = d.name + "_Bob";
-	nodes.push({"name":new_name, "group": d.group});
-	links.push({"source":findNodeIndex(d.name), 
-		    "target":findNodeIndex(new_name), "value": 1 });
-	console.log( "Source: " + findNodeIndex(d.name));
-	console.log( "Target: " + findNodeIndex(new_name));
+    var begin = function() {
+	console.log("Begin");
+
+	
+	for(var i=0; i < initial_nodes.length; ++i) {
+	    nodes.push(initial_nodes[i]);
+	}
+	for(var i=0; i < initial_links.length; ++i) {
+	    links.push(initial_links[i]);
+	}
+	/*
+	// Get the JSON
+	d3.json('/static/miserables.json', function(error, json) {
+
+	    for(var i=0; i < json.nodes.length; ++i) {
+		nodes.push(json.nodes[i]);
+	    }
+	    for(var i=0; i < json.links.length; ++i) {
+		links.push(json.links[i]);
+	    }
+
+	    // Now, update
+	    update();
+	});
+*/
 	update();
-    });
+    }
 
-    // node.exit().remove();
+    var update = function () {
+	console.log("Update");
 
-    // Restart the force layout.
-    force.start(); //xstart();
+	// vis
+        var link = svg.selectAll("line.link")
+            .data(links, function(d) { return d.source.name + "-" + d.target.name; });
+
+        link.enter().insert("line")
+            .attr("class", "link");
+
+        link.exit().remove();
+
+	// vis
+        var node = svg.selectAll("g.node")
+            .data(nodes, function(d) { return d.name;});
+
+        var nodeEnter = node.enter().append("g")
+            .attr("class", "node")
+            .call(force.drag);
+
+        nodeEnter.append("circle")
+            .attr("class", "circle")
+            .attr("r", 10)
+            .style("fill", function(d) { return color(d.group); })
+	    .append("svg:title")
+	    .text(function(d) { return d.name; });
+
+	// Make the ability to add new nodes
+	// by clicking
+	nodeEnter.on("click", function(d) {
+	    var name = makename();
+	    var group = d.group;
+	    self.addNode(name, group);
+	    self.addLink(d.name, name);
+	});
+	
+	//nodeEnter.on("mouseover", addLabel);
+	//nodeEnter.on("mouseout", clearLabel);
+
+        node.exit().remove();
+
+        force.on("tick", function() {
+	    link.attr("x1", function(d) { return d.source.x; })
+		.attr("y1", function(d) { return d.source.y; })
+		.attr("x2", function(d) { return d.target.x; })
+		.attr("y2", function(d) { return d.target.y; });
+
+	    node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+	});
+
+        // Restart the force layout.
+        force.start();
+    }
+
+    // Make it all go
+    begin();
 }
 
-// Get the JSON
-d3.json('/static/miserables.json', function(error, json) {
-    graph = json;
-    begin();
-    update();
-});
 
+// set up the D3 visualisation in the specified element
+//var w = 960;
+//var h = 700;
+/*
+var svg = d3.select("body").append("svg:svg")
+    .attr("width", 960)
+    .attr("height", 700);
+
+graph = new myGraph(svg);
+*/
