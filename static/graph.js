@@ -73,7 +73,7 @@ myGraph.prototype.findNodeIndex = function(name) {
 
 myGraph.prototype.update = function () {
 
-    self = this;
+    var self = this;
 
     var link = this.svg.selectAll("line.link")
         .data(self.links, function(d) { return d.source.name + "-" + d.target.name; });
@@ -141,7 +141,7 @@ myGraph.prototype.removeNode = function(name) {
 	else i++;
     }
     nodes.splice(findNodeIndex(name),1);
-    update();
+    this.update();
 }
 
 
