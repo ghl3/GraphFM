@@ -6,73 +6,42 @@
 
 function myGraph(svg, initial_nodes, initial_links) {
 
-    //
-    // Public API
-    //
-
-    // Add and remove elements on the graph object
-    this.addNode = function(node) {
-	nodes.push(node);
-	update();
-    }
-
-    this.removeNode = function(name) {
-	var i = 0;
-	var n = findNode(name);
-	while (i < links.length) {
-	    if ((links[i]['source'] == n)||(links[i]['target'] == n)) links.splice(i,1);
-	    else i++;
-	}
-	nodes.splice(findNodeIndex(name),1);
-	update();
-    }
-
-    this.addLink = function(source, target, value) {
-	if( value==null ) value = 1.0;
-	links.push({"source":findNode(source), 
-		    "target":findNode(target),
-		    "value":value});
-	update();
-    }
-
-    
-    this.addNeighbor = function(node, neighbor, value) {
-	// Add 'neighbor' as a neighbor to 'node'
-	console.log("Adding neighbor: " + neighbor.name);
-	console.log("To node: " + node.name);
-	console.log("with value: " + value);
-	self.addNode(neighbor);
-	self.addLink(neighbor.name, node.name, value);
-    }
-
     // 
     // Private Implementation
     //
 
-    var w = 960; //svg[0][0].getAttribute("width");
-    var h = 700; //svg[0][0].getAttribute("height");
-
     var self = this;
 
-    var color = d3.scale.category20();
+    this.svg = svg;
 
-    var findNode = function(name) {
-	for (var i in nodes) {if (nodes[i]["name"] === name) return nodes[i]};
-    }
-    
-    var findNodeIndex = function(name) {
-        for (var i in nodes) {if (nodes[i]["name"] === name) return i};
-    }
+    this.color = d3.scale.category20();
 
-    var force = d3.layout.force()
+    var w = 960; //svg[0][0].getAttribute("width");
+    var h = 700; //svg[0][0].getAttribute("height");
+    this.force = d3.layout.force()
         .gravity(.05)
         .distance(100)
         .charge(-100)
         .size([w, h]);
 
-    var nodes = force.nodes(),
-    links = force.links();
+    this.nodes = this.force.nodes();
+    this.links = this.force.links();
 
+    var begin = function() {
+	
+	for(var i=0; i < initial_nodes.length; ++i) {
+	    self.nodes.push(initial_nodes[i]);
+	}
+	for(var i=0; i < initial_links.length; ++i) {
+	    self.links.push(initial_links[i]);
+	}
+
+	self.update();
+    }
+
+    begin();
+
+    /*
     var makename = function() {
 	var text = "";
 	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -82,13 +51,8 @@ function myGraph(svg, initial_nodes, initial_links) {
 	
 	return text;
     }
-
-    var link_length = function(match) {
-	// Convert between lastfm match
-	// length and link length
-	return Math.max(Math.ceil((match-.99)*1000), 1.0);
-    }
-
+    */
+/*
     var add_lastfm_neighbor = function(node) {
 
 	var neigh_url = "http://ws.audioscrobbler.com/2.0/?method=user.getneighbours";
@@ -108,24 +72,14 @@ function myGraph(svg, initial_nodes, initial_links) {
 	    
 	});
     }
-    
-    var begin = function() {
-	
-	for(var i=0; i < initial_nodes.length; ++i) {
-	    nodes.push(initial_nodes[i]);
-	}
-	for(var i=0; i < initial_links.length; ++i) {
-	    links.push(initial_links[i]);
-	}
+*/
 
-	update();
-    }
-
+/*
     var update = function () {
 
 	// vis
         var link = svg.selectAll("line.link")
-            .data(links, function(d) { return d.source.name + "-" + d.target.name; });
+            .data(self.links, function(d) { return d.source.name + "-" + d.target.name; });
 
         link.enter().insert("line")
             .attr("class", "link")
@@ -135,7 +89,7 @@ function myGraph(svg, initial_nodes, initial_links) {
 
 	// vis
         var node = svg.selectAll("g.node")
-            .data(nodes, function(d) { return d.name;});
+            .data(self.nodes, function(d) { return d.name;});
 
         var nodeEnter = node.enter().append("g")
             .attr("class", "node")
@@ -151,26 +105,15 @@ function myGraph(svg, initial_nodes, initial_links) {
 	// Make the ability to add new nodes
 	// by clicking
 	nodeEnter.on("click", function(d) {
-	    // Pick a neighbor at random
-
-	    //match: "0.99598240852356"
-	    
-	    console.log("Clicked on: " + d.name);
-	    add_lastfm_neighbor(d);
-	    /*
-	    var name = makename();
-	    var group = d.group;
-	    var node = {"name":name, "group":group}
-	    self.addNeighbor(node, d.name, length);
-	    */
-	    //self.addNode(node);
-	    //self.addLink(d.name, name);
+	    self.on_click(d);
 	});
 	
-	nodeEnter.on("mouseover", function() {
-	    
+	nodeEnter.on("mouseover", function(d) {
+	    self.on_mouseover(d);
 	});
-	nodeEnter.on("mouseout", function(){
+
+	nodeEnter.on("mouseout", function(d){
+	    self.on_mouseout(d);
 	});
 
         node.exit().remove();
@@ -186,8 +129,143 @@ function myGraph(svg, initial_nodes, initial_links) {
 
         // Restart the force layout.
         force.start();
-    }
-
+    }.bind(self);
+*/
     // Make it all go
-    begin();
+
 }
+
+//
+// Private implementation
+//
+
+
+myGraph.prototype.findNode = function(name) {
+    for (var i in this.nodes) {if (this.nodes[i]["name"] === name) return this.nodes[i]};
+}
+
+myGraph.prototype.findNodeIndex = function(name) {
+    for (var i in this.nodes) {if (this.nodes[i]["name"] === name) return i};
+}
+
+
+
+
+myGraph.prototype.update = function () {
+
+    self = this;
+
+    // vis
+    var link = this.svg.selectAll("line.link")
+        .data(self.links, function(d) { return d.source.name + "-" + d.target.name; });
+
+    link.enter().insert("line")
+        .attr("class", "link")
+	.style("stroke-width", function(d) { return Math.sqrt(d.value); });
+
+    link.exit().remove();
+
+    // vis
+    var node = this.svg.selectAll("g.node")
+        .data(self.nodes, function(d) { return d.name;});
+
+    var nodeEnter = node.enter().append("g")
+        .attr("class", "node")
+        .call(this.force.drag);
+
+    nodeEnter.append("circle")
+        .attr("class", "circle")
+        .attr("r", 10)
+        .style("fill", function(d) { return self.color(d.group); })
+	.append("svg:title")
+	.text(function(d) { return d.name; });
+
+    // Make the ability to add new nodes
+    // by clicking
+    nodeEnter.on("click", function(d) {
+	self.on_click(d);
+    });
+    
+    nodeEnter.on("mouseover", function(d) {
+	self.on_mouseover(d);
+    });
+
+    nodeEnter.on("mouseout", function(d){
+	self.on_mouseout(d);
+    });
+
+    node.exit().remove();
+
+    this.force.on("tick", function() {
+	link.attr("x1", function(d) { return d.source.x; })
+	    .attr("y1", function(d) { return d.source.y; })
+	    .attr("x2", function(d) { return d.target.x; })
+	    .attr("y2", function(d) { return d.target.y; });
+
+	node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+    });
+
+    // Restart the force layout.
+    this.force.start();
+}
+
+
+
+//
+// Public API
+//
+
+// Add and remove elements on the graph object
+myGraph.prototype.addNode = function(node) {
+    console.log("addNode");
+    console.log(this.nodes);
+    this.nodes.push(node);
+    this.update();
+}
+
+myGraph.prototype.removeNode = function(name) {
+    var i = 0;
+    var n = findNode(name);
+    while (i < links.length) {
+	if ((links[i]['source'] == n)||(links[i]['target'] == n)) links.splice(i,1);
+	else i++;
+    }
+    nodes.splice(findNodeIndex(name),1);
+    update();
+}
+
+myGraph.prototype.addLink = function(source, target, value) {
+    if( value==null ) value = 1.0;
+    this.links.push({"source" : this.findNode(source), 
+		     "target" : this.findNode(target),
+		     "value" : value});
+    this.update();
+}
+
+myGraph.prototype.addNeighbor = function(node, neighbor, value) {
+
+    self = this;
+
+    // Add 'neighbor' as a neighbor to 'node'
+    console.log("Adding neighbor: " + neighbor.name);
+    console.log("To node: " + node.name);
+    console.log("with value: " + value);
+    self.addNode(neighbor);
+    self.addLink(neighbor.name, node.name, value);
+}
+
+
+// These methods can be implemented
+
+myGraph.prototype.on_click = function() { 
+    console.log("Click");
+}
+    
+myGraph.prototype.on_mouseover = function() { 
+    console.log("Mouse Over");
+}
+
+myGraph.prototype.on_mouseout = function() { 
+    console.log("Mouse Out");
+}
+
