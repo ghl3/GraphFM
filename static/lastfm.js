@@ -15,19 +15,20 @@ $(document).ready(function() {
 
     });
 
-    // var neigh_url = "http://ws.audioscrobbler.com/2.0/?method=user.getneighbours&user=rj&api_key=4ea86273090fac63525518c0a77465a4&format=json";
-
     var user_url = "http://ws.audioscrobbler.com/2.0/?method=user.getinfo&user=rj&api_key=4ea86273090fac63525518c0a77465a4&format=json";
 
     var svg = d3.select("#graph").append("svg:svg")
 	.attr("width", 960)
 	.attr("height", 700);
 
+    // Create the graph itself
     var graph = null;
     d3.json(user_url, function(error, json) {
 	console.log(json);
 	graph = new myGraph(svg, new Array(json.user), new Array());
 	console.log("Successfully made graph");
     })
+
+
 
 });

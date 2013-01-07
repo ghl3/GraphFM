@@ -167,8 +167,11 @@ function myGraph(svg, initial_nodes, initial_links) {
 	    //self.addLink(d.name, name);
 	});
 	
-	//nodeEnter.on("mouseover", addLabel);
-	//nodeEnter.on("mouseout", clearLabel);
+	nodeEnter.on("mouseover", function() {
+	    
+	});
+	nodeEnter.on("mouseout", function(){
+	});
 
         node.exit().remove();
 
