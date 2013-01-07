@@ -6,45 +6,6 @@
 
 function myGraph(svg, initial_nodes, initial_links) {
 
-    //
-    // Public API
-    //
-
-    // Add and remove elements on the graph object
-    this.addNode = function(node) {
-	nodes.push(node);
-	update();
-    }
-
-    this.removeNode = function(name) {
-	var i = 0;
-	var n = findNode(name);
-	while (i < links.length) {
-	    if ((links[i]['source'] == n)||(links[i]['target'] == n)) links.splice(i,1);
-	    else i++;
-	}
-	nodes.splice(findNodeIndex(name),1);
-	update();
-    }
-
-    this.addLink = function(source, target, value) {
-	if( value==null ) value = 1.0;
-	links.push({"source":findNode(source), 
-		    "target":findNode(target),
-		    "value":value});
-	update();
-    }
-
-    
-    this.addNeighbor = function(node, neighbor, value) {
-	// Add 'neighbor' as a neighbor to 'node'
-	console.log("Adding neighbor: " + neighbor.name);
-	console.log("To node: " + node.name);
-	console.log("with value: " + value);
-	self.addNode(neighbor);
-	self.addLink(neighbor.name, node.name, value);
-    }
-
     // 
     // Private Implementation
     //
@@ -108,7 +69,7 @@ function myGraph(svg, initial_nodes, initial_links) {
 	    
 	});
     }
-    
+
     var begin = function() {
 	
 	for(var i=0; i < initial_nodes.length; ++i) {
@@ -151,12 +112,16 @@ function myGraph(svg, initial_nodes, initial_links) {
 	// Make the ability to add new nodes
 	// by clicking
 	nodeEnter.on("click", function(d) {
-	    // Pick a neighbor at random
+	    self.on_click();
 
-	    //match: "0.99598240852356"
-	    
+	    /*
 	    console.log("Clicked on: " + d.name);
 	    add_lastfm_neighbor(d);
+	    */
+
+	    // Pick a neighbor at random
+	    //match: "0.99598240852356"
+	    
 	    /*
 	    var name = makename();
 	    var group = d.group;
@@ -167,8 +132,13 @@ function myGraph(svg, initial_nodes, initial_links) {
 	    //self.addLink(d.name, name);
 	});
 	
-	//nodeEnter.on("mouseover", addLabel);
-	//nodeEnter.on("mouseout", clearLabel);
+	nodeEnter.on("mouseover", function(d) {
+	    self.on_mouseover();
+	});
+
+	nodeEnter.on("mouseout", function(d){
+	    self.on_mouseout();
+	});
 
         node.exit().remove();
 
@@ -188,3 +158,58 @@ function myGraph(svg, initial_nodes, initial_links) {
     // Make it all go
     begin();
 }
+
+
+//
+// Public API
+//
+
+// Add and remove elements on the graph object
+myGraph.prototype.addNode = function(node) {
+    nodes.push(node);
+    update();
+}
+
+myGraph.prototype.removeNode = function(name) {
+    var i = 0;
+    var n = findNode(name);
+    while (i < links.length) {
+	if ((links[i]['source'] == n)||(links[i]['target'] == n)) links.splice(i,1);
+	else i++;
+    }
+    nodes.splice(findNodeIndex(name),1);
+    update();
+}
+
+myGraph.prototype.addLink = function(source, target, value) {
+    if( value==null ) value = 1.0;
+    links.push({"source":findNode(source), 
+		"target":findNode(target),
+		"value":value});
+    update();
+}
+
+myGraph.prototype.addNeighbor = function(node, neighbor, value) {
+    // Add 'neighbor' as a neighbor to 'node'
+    console.log("Adding neighbor: " + neighbor.name);
+    console.log("To node: " + node.name);
+    console.log("with value: " + value);
+    self.addNode(neighbor);
+    self.addLink(neighbor.name, node.name, value);
+}
+
+
+// These methods can be implemented
+
+myGraph.prototype.on_click = function() { 
+    console.log("Click");
+}
+    
+myGraph.prototype.on_mouseover = function() { 
+    console.log("Mouse Over");
+}
+
+myGraph.prototype.on_mouseout = function() { 
+    console.log("Mouse Out");
+}
+
