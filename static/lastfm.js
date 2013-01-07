@@ -26,6 +26,13 @@ myGraph.prototype.on_click = function(node) {
     });
 }
 
+myGraph.prototype.on_mouseover = function(node) {
+    $("#selected_user_name").text(node.name);
+}
+
+myGraph.prototype.on_mouseout = function(node) {
+    $("#selected_user_name").text('');
+}
 
 $(document).ready(function() {
 
