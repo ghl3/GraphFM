@@ -10,34 +10,38 @@ function myGraph(svg, initial_nodes, initial_links) {
     // Private Implementation
     //
 
+    var self = this;
+
     this.svg = svg;
+
+    this.color = d3.scale.category20();
 
     var w = 960; //svg[0][0].getAttribute("width");
     var h = 700; //svg[0][0].getAttribute("height");
-
-    var self = this;
-
-    var color = d3.scale.category20();
-
-    var findNode = function(name) {
-	for (var i in nodes) {if (nodes[i]["name"] === name) return nodes[i]};
-    }
-    
-    var findNodeIndex = function(name) {
-        for (var i in nodes) {if (nodes[i]["name"] === name) return i};
-    }
-
     this.force = d3.layout.force()
         .gravity(.05)
         .distance(100)
         .charge(-100)
         .size([w, h]);
 
-
     this.nodes = this.force.nodes();
     this.links = this.force.links();
 
+    var begin = function() {
+	
+	for(var i=0; i < initial_nodes.length; ++i) {
+	    self.nodes.push(initial_nodes[i]);
+	}
+	for(var i=0; i < initial_links.length; ++i) {
+	    self.links.push(initial_links[i]);
+	}
 
+	self.update();
+    }
+
+    begin();
+
+    /*
     var makename = function() {
 	var text = "";
 	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -47,7 +51,8 @@ function myGraph(svg, initial_nodes, initial_links) {
 	
 	return text;
     }
-
+    */
+/*
     var add_lastfm_neighbor = function(node) {
 
 	var neigh_url = "http://ws.audioscrobbler.com/2.0/?method=user.getneighbours";
@@ -67,18 +72,7 @@ function myGraph(svg, initial_nodes, initial_links) {
 	    
 	});
     }
-
-    var begin = function() {
-	
-	for(var i=0; i < initial_nodes.length; ++i) {
-	    self.nodes.push(initial_nodes[i]);
-	}
-	for(var i=0; i < initial_links.length; ++i) {
-	    self.links.push(initial_links[i]);
-	}
-
-	self.update();
-    }
+*/
 
 /*
     var update = function () {
@@ -138,12 +132,24 @@ function myGraph(svg, initial_nodes, initial_links) {
     }.bind(self);
 */
     // Make it all go
-    begin();
+
 }
 
 //
 // Private implementation
 //
+
+
+myGraph.prototype.findNode = function(name) {
+    for (var i in this.nodes) {if (this.nodes[i]["name"] === name) return this.nodes[i]};
+}
+
+myGraph.prototype.findNodeIndex = function(name) {
+    for (var i in this.nodes) {if (this.nodes[i]["name"] === name) return i};
+}
+
+
+
 
 myGraph.prototype.update = function () {
 
@@ -165,12 +171,12 @@ myGraph.prototype.update = function () {
 
     var nodeEnter = node.enter().append("g")
         .attr("class", "node")
-        .call(force.drag);
+        .call(this.force.drag);
 
     nodeEnter.append("circle")
         .attr("class", "circle")
         .attr("r", 10)
-        .style("fill", function(d) { return color(d.group); })
+        .style("fill", function(d) { return self.color(d.group); })
 	.append("svg:title")
 	.text(function(d) { return d.name; });
 
@@ -190,7 +196,7 @@ myGraph.prototype.update = function () {
 
     node.exit().remove();
 
-    force.on("tick", function() {
+    this.force.on("tick", function() {
 	link.attr("x1", function(d) { return d.source.x; })
 	    .attr("y1", function(d) { return d.source.y; })
 	    .attr("x2", function(d) { return d.target.x; })
@@ -200,7 +206,7 @@ myGraph.prototype.update = function () {
     });
 
     // Restart the force layout.
-    force.start();
+    this.force.start();
 }
 
 
@@ -214,7 +220,7 @@ myGraph.prototype.addNode = function(node) {
     console.log("addNode");
     console.log(this.nodes);
     this.nodes.push(node);
-    update();
+    this.update();
 }
 
 myGraph.prototype.removeNode = function(name) {
@@ -230,10 +236,10 @@ myGraph.prototype.removeNode = function(name) {
 
 myGraph.prototype.addLink = function(source, target, value) {
     if( value==null ) value = 1.0;
-    links.push({"source":findNode(source), 
-		"target":findNode(target),
-		"value":value});
-    update();
+    this.links.push({"source" : this.findNode(source), 
+		     "target" : this.findNode(target),
+		     "value" : value});
+    this.update();
 }
 
 myGraph.prototype.addNeighbor = function(node, neighbor, value) {
