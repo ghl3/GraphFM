@@ -46,8 +46,9 @@ var reset = function() {
 
 var add_user_node = function() {
     var user_name = $("#user_name").val();
+    var group = Math.floor(Math.random()*10);
     console.log("Creating new user node for user: " + user_name);
-    graph.addNode( {"name" : user_name} );
+    graph.addNode( {"name" : user_name, "group" : group} );
 }
 
 
