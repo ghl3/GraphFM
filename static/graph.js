@@ -10,6 +10,8 @@ function myGraph(svg, initial_nodes, initial_links) {
     // Private Implementation
     //
 
+    this.svg = svg;
+
     var w = 960; //svg[0][0].getAttribute("width");
     var h = 700; //svg[0][0].getAttribute("height");
 
@@ -25,14 +27,16 @@ function myGraph(svg, initial_nodes, initial_links) {
         for (var i in nodes) {if (nodes[i]["name"] === name) return i};
     }
 
-    var force = d3.layout.force()
+    this.force = d3.layout.force()
         .gravity(.05)
         .distance(100)
         .charge(-100)
         .size([w, h]);
 
-    var nodes = force.nodes(),
-    links = force.links();
+
+    this.nodes = this.force.nodes();
+    this.links = this.force.links();
+
 
     var makename = function() {
 	var text = "";
@@ -42,12 +46,6 @@ function myGraph(svg, initial_nodes, initial_links) {
 	    text += possible.charAt(Math.floor(Math.random() * possible.length));
 	
 	return text;
-    }
-
-    var link_length = function(match) {
-	// Convert between lastfm match
-	// length and link length
-	return Math.max(Math.ceil((match-.99)*1000), 1.0);
     }
 
     var add_lastfm_neighbor = function(node) {
@@ -73,20 +71,21 @@ function myGraph(svg, initial_nodes, initial_links) {
     var begin = function() {
 	
 	for(var i=0; i < initial_nodes.length; ++i) {
-	    nodes.push(initial_nodes[i]);
+	    self.nodes.push(initial_nodes[i]);
 	}
 	for(var i=0; i < initial_links.length; ++i) {
-	    links.push(initial_links[i]);
+	    self.links.push(initial_links[i]);
 	}
 
-	update();
+	self.update();
     }
 
+/*
     var update = function () {
 
 	// vis
         var link = svg.selectAll("line.link")
-            .data(links, function(d) { return d.source.name + "-" + d.target.name; });
+            .data(self.links, function(d) { return d.source.name + "-" + d.target.name; });
 
         link.enter().insert("line")
             .attr("class", "link")
@@ -96,7 +95,7 @@ function myGraph(svg, initial_nodes, initial_links) {
 
 	// vis
         var node = svg.selectAll("g.node")
-            .data(nodes, function(d) { return d.name;});
+            .data(self.nodes, function(d) { return d.name;});
 
         var nodeEnter = node.enter().append("g")
             .attr("class", "node")
@@ -112,32 +111,15 @@ function myGraph(svg, initial_nodes, initial_links) {
 	// Make the ability to add new nodes
 	// by clicking
 	nodeEnter.on("click", function(d) {
-	    self.on_click();
-
-	    /*
-	    console.log("Clicked on: " + d.name);
-	    add_lastfm_neighbor(d);
-	    */
-
-	    // Pick a neighbor at random
-	    //match: "0.99598240852356"
-	    
-	    /*
-	    var name = makename();
-	    var group = d.group;
-	    var node = {"name":name, "group":group}
-	    self.addNeighbor(node, d.name, length);
-	    */
-	    //self.addNode(node);
-	    //self.addLink(d.name, name);
+	    self.on_click(d);
 	});
 	
 	nodeEnter.on("mouseover", function(d) {
-	    self.on_mouseover();
+	    self.on_mouseover(d);
 	});
 
 	nodeEnter.on("mouseout", function(d){
-	    self.on_mouseout();
+	    self.on_mouseout(d);
 	});
 
         node.exit().remove();
@@ -153,11 +135,74 @@ function myGraph(svg, initial_nodes, initial_links) {
 
         // Restart the force layout.
         force.start();
-    }
-
+    }.bind(self);
+*/
     // Make it all go
     begin();
 }
+
+//
+// Private implementation
+//
+
+myGraph.prototype.update = function () {
+
+    self = this;
+
+    // vis
+    var link = this.svg.selectAll("line.link")
+        .data(self.links, function(d) { return d.source.name + "-" + d.target.name; });
+
+    link.enter().insert("line")
+        .attr("class", "link")
+	.style("stroke-width", function(d) { return Math.sqrt(d.value); });
+
+    link.exit().remove();
+
+    // vis
+    var node = this.svg.selectAll("g.node")
+        .data(self.nodes, function(d) { return d.name;});
+
+    var nodeEnter = node.enter().append("g")
+        .attr("class", "node")
+        .call(force.drag);
+
+    nodeEnter.append("circle")
+        .attr("class", "circle")
+        .attr("r", 10)
+        .style("fill", function(d) { return color(d.group); })
+	.append("svg:title")
+	.text(function(d) { return d.name; });
+
+    // Make the ability to add new nodes
+    // by clicking
+    nodeEnter.on("click", function(d) {
+	self.on_click(d);
+    });
+    
+    nodeEnter.on("mouseover", function(d) {
+	self.on_mouseover(d);
+    });
+
+    nodeEnter.on("mouseout", function(d){
+	self.on_mouseout(d);
+    });
+
+    node.exit().remove();
+
+    force.on("tick", function() {
+	link.attr("x1", function(d) { return d.source.x; })
+	    .attr("y1", function(d) { return d.source.y; })
+	    .attr("x2", function(d) { return d.target.x; })
+	    .attr("y2", function(d) { return d.target.y; });
+
+	node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+    });
+
+    // Restart the force layout.
+    force.start();
+}
+
 
 
 //
@@ -166,7 +211,9 @@ function myGraph(svg, initial_nodes, initial_links) {
 
 // Add and remove elements on the graph object
 myGraph.prototype.addNode = function(node) {
-    nodes.push(node);
+    console.log("addNode");
+    console.log(this.nodes);
+    this.nodes.push(node);
     update();
 }
 
@@ -190,6 +237,9 @@ myGraph.prototype.addLink = function(source, target, value) {
 }
 
 myGraph.prototype.addNeighbor = function(node, neighbor, value) {
+
+    self = this;
+
     // Add 'neighbor' as a neighbor to 'node'
     console.log("Adding neighbor: " + neighbor.name);
     console.log("To node: " + node.name);
