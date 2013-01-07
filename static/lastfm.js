@@ -35,10 +35,6 @@ myGraph.prototype.on_click = function(node) {
     var self = this;
 
     console.log(node);
-    
-    // var neigh_url = "http://ws.audioscrobbler.com/2.0/?method=user.getneighbours";
-    // neigh_url += "&user=" + node.name;
-    // neigh_url += "&api_key=4ea86273090fac63525518c0a77465a4&format=json";
 
     var neigh_url = lastfm.user_getneighbours({"user" : node.name});
     d3.json(neigh_url, function(json) {
@@ -81,25 +77,11 @@ var add_user_node = function() {
 
 $(document).ready(function() {
 
-    var neighbours=null;
-    var neigh_url = "http://ws.audioscrobbler.com/2.0/?method=user.getneighbours&user=rj&api_key=4ea86273090fac63525518c0a77465a4&format=json";
-
-    d3.json(neigh_url, function(json) {
-	console.log(json);
-	neighbours=json.neighbours;
-	
-	len = neighbours.user.length;
-	var idx = Math.floor(Math.random()*len);
-	console.log( neighbours.user[idx]);
-    });
-
-
     var svg = d3.select("#graph").append("svg:svg")
 	.attr("width", 960)
 	.attr("height", 700);
 
     // Initialize the graph with the selected user
-    //var user_url = "http://ws.audioscrobbler.com/2.0/?method=user.getinfo&user=rj&api_key=4ea86273090fac63525518c0a77465a4&format=json";
     var user_url = lastfm.user_getinfo({"user" : "rj"});
     d3.json(user_url, function(error, json) {
 	var user = json.user;
