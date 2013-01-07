@@ -62,12 +62,20 @@ function myGraph(svg, initial_nodes, initial_links) {
 
 
 myGraph.prototype.findNode = function(name) {
-    for (var i in this.nodes) {if (this.nodes[i]["name"] === name) return this.nodes[i]};
+    for (var i in this.nodes) {
+	if(this.nodes[i]["name"] === name) return this.nodes[i];
+    }
+    console.log("Couldn't find node with name: " + name);
+    return null;
 }
 
 
 myGraph.prototype.findNodeIndex = function(name) {
-    for (var i in this.nodes) {if (this.nodes[i]["name"] === name) return i};
+    for (var i in this.nodes) {
+	if(this.nodes[i]["name"] === name) return i;
+    }
+    console.log("Couldn't find node index with name: " + name);
+    return null;
 }
 
 
@@ -128,7 +136,9 @@ myGraph.prototype.update = function () {
 
 
 myGraph.prototype.addNode = function(node) {
-    this.nodes.push(node);
+    if( this.findNode(node.name) == null ) {
+	this.nodes.push(node);
+    }
     this.update();
 }
 
@@ -155,7 +165,12 @@ myGraph.prototype.addLink = function(source, target, value) {
 
 
 myGraph.prototype.addNeighbor = function(node, neighbor, value) {
-    this.addNode(neighbor);
+    // Add the node if it doesn't exist
+    // Otherwise, only add the link
+    if( this.findNode(neighbor.name) == null ) {
+	console.log("Creating neighbor: must add new node: " + node);
+	this.addNode(neighbor);
+    }
     this.addLink(neighbor.name, node.name, value);
 }
 
