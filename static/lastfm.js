@@ -7,27 +7,50 @@ function lastfm_api() {
     this.format = "json";
 }
 
+lastfm_api.prototype.compose_url = function(url_target, params) {
+    // Get a url for a given lastfm api target
+    var url = this.base_url + '?';
+    url += "method=" + url_target;
+    url += "&" + $.param(params);
+    url += "&api_key=" + this.api_key;
+    url += "&format=" + this.format;
+    return url;
+}
+
 lastfm_api.prototype.user_getneighbours = function(params) {
+    return this.compose_url("user.getneighbours", params);
+    /*
     var url = this.base_url + '?';
     url += "method=user.getneighbours";
     url += "&" + $.param(params);
     url += "&api_key=" + this.api_key;
     url += "&format=" + this.format;
     return url;
+    */
 }
 
 lastfm_api.prototype.user_getinfo = function(params) {
+    return this.compose_url("user.gettopartists", params);
+    /*
     var url = this.base_url + '?';
     url += "method=user.getinfo";
     url += "&" + $.param(params);
     url += "&api_key=" + this.api_key;
     url += "&format=" + this.format;
     return url;
+    */
+}
+
+lastfm_api.prototype.user_getinfo = function(params) {
+    return this.compose_url("user.getinfo", params);
 }
 
 // Global Variables
 var lastfm = new lastfm_api();
 var graph = null;
+var user_cache = new Array(); // name : info
+var top_tracks_cache = new Array(); // name : tracks
+
 
 // Implement how clicks create new nodes and links
 myGraph.prototype.on_click = function(node) {
@@ -64,6 +87,10 @@ myGraph.prototype.on_click = function(node) {
 	var neighbour_url = lastfm.user_getinfo({"user" : neighbour.name});
 	
 	d3.json(neighbour_url, function(error, json) {
+	    if( json.error != null ) {
+		console.log("No User Found with name: " + neighbour.name);
+		return;
+	    }
 	    var neighbour_user = json.user;
 	    neighbour_user['group'] = node.group;
 	    self.addNeighbor(node, neighbour_user, link_length);
@@ -100,6 +127,11 @@ var add_user_node = function() {
 
     var user_url = lastfm.user_getinfo({"user" : user_name});
     d3.json(user_url, function(error, json) {
+	if( json.error != null ) {
+	    console.log("No User Found with name: " + user_name);
+	    return;
+	}
+	var neighbour_user = json.user;
 	graph.addNode(json.user);
     })
 }
