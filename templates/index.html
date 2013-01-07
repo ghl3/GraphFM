@@ -22,7 +22,10 @@
   <body >
     <div id="header" bgcolor="black">
       <h1>LastFM Graph</h1><br/>
-      <p class="control_panel"> <!--<img src="potential.png" width="100%" />--> <br/><br/></p>
+      <p class="control_panel">
+
+      <input type="button" id="reset" value="Reset" onClick="reset();"
+	     style="margin-bottom: 20px"/> <br>
 
       <table cellpadding=1 cellspacing=10 width="100%" class="control_panel">
 
@@ -73,7 +76,8 @@
         <tr><td colspan="2"><br/></td></tr>
       </table>
 
-      <input type="button" id="reset" value="Reset" onClick="reset();" />
+      <div id="top_artists">
+      </div>
 
     </div>
 

@@ -19,31 +19,16 @@ lastfm_api.prototype.compose_url = function(url_target, params) {
 
 lastfm_api.prototype.user_getneighbours = function(params) {
     return this.compose_url("user.getneighbours", params);
-    /*
-    var url = this.base_url + '?';
-    url += "method=user.getneighbours";
-    url += "&" + $.param(params);
-    url += "&api_key=" + this.api_key;
-    url += "&format=" + this.format;
-    return url;
-    */
 }
 
-lastfm_api.prototype.user_getinfo = function(params) {
+lastfm_api.prototype.user_gettopartists = function(params) {
     return this.compose_url("user.gettopartists", params);
-    /*
-    var url = this.base_url + '?';
-    url += "method=user.getinfo";
-    url += "&" + $.param(params);
-    url += "&api_key=" + this.api_key;
-    url += "&format=" + this.format;
-    return url;
-    */
 }
 
 lastfm_api.prototype.user_getinfo = function(params) {
     return this.compose_url("user.getinfo", params);
 }
+
 
 // Global Variables
 var lastfm = new lastfm_api();
@@ -51,10 +36,27 @@ var graph = null;
 var user_cache = new Array(); // name : info
 var top_tracks_cache = new Array(); // name : tracks
 
-
 // Implement how clicks create new nodes and links
 myGraph.prototype.on_click = function(node) {
     
+    var click_action = $('input[name=click_action]:checked').val();
+
+    if(click_action==null) return;
+    else if( click_action == "neighbor" ) {
+	this.add_lastfm_neighbor(node);
+    }
+    else if( click_action == "top_artists" ) {
+	show_top_artists(node);
+    }
+    else {
+	console.log("Error: Unexpected click action: " + click_action);
+	return;
+    }
+
+}
+
+myGraph.prototype.add_lastfm_neighbor = function(node) {
+
     var self = this;
 
     var neigh_url = lastfm.user_getneighbours({"user" : node.name});
@@ -136,6 +138,36 @@ var add_user_node = function() {
     })
 }
 
+
+var show_top_artists = function(node) {
+    // Display the top artists of the
+    // user associated with the given node
+    
+    var top_url = lastfm.user_gettopartists({"user" : node.name, "limit" : 5});
+    d3.json(top_url, function(json) {
+	console.log(json);
+	var artist_array = json.topartists.artist;
+	console.log(artist_array);
+
+	// Create a table in the dom, 
+	// add the artist list,
+	// and then show the table
+	$('#top_artists').empty();
+	var table = $('<table style="text-align: center;"></table>').addClass('control_panel');
+	table.append("<tr><td class='label'>Top Artists</td></tr>");
+	for(var i=0; i<5; i++){
+	    var row = $('<tr></tr>').addClass('bar').text(artist_array[i].name);
+	    table.append(row);
+	}
+	$('#top_artists').append(table);
+
+	//for(var idx=0; idx < artist_array.length; ++idx) {
+	//    console.log(artist_array[idx].name);
+	//}
+	
+    })
+    
+} 
 
 $(document).ready(function() {
 
