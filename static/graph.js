@@ -160,6 +160,15 @@ myGraph.prototype.addNeighbor = function(node, neighbor, value) {
 }
 
 
+myGraph.prototype.reset = function() {
+    // LOL, is this really how javascript
+    // makes me clear an array? wft
+    this.nodes.length = 0;
+    this.links.length = 0;
+    this.update();
+}
+
+
 //
 // These methods should be implemented by the user
 // Consider them 'virtual'

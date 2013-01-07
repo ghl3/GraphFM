@@ -1,5 +1,8 @@
 
 
+// Global Variables
+var graph = null;
+
 // Implement how clicks create new nodes and links
 myGraph.prototype.on_click = function(node) {
     
@@ -34,6 +37,13 @@ myGraph.prototype.on_mouseout = function(node) {
     $("#selected_user_name").text('');
 }
 
+
+var reset = function() {
+    console.log("reset");
+    graph.reset();
+}
+
+
 $(document).ready(function() {
 
     var neighbours=null;
@@ -56,7 +66,7 @@ $(document).ready(function() {
 	.attr("height", 700);
 
 
-    var graph = null;
+    //var graph = null;
     d3.json(user_url, function(error, json) {
 	console.log(json);
 	graph = new myGraph(svg, new Array(json.user), new Array());
