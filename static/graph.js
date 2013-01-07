@@ -9,8 +9,8 @@ function myGraph(svg, initial_nodes, initial_links) {
     //
 
     // Add and remove elements on the graph object
-    this.addNode = function(name, group) {
-	nodes.push({"name":name, "group":group});
+    this.addNode = function(node) {
+	nodes.push(node);
 	update();
     }
 
@@ -25,17 +25,25 @@ function myGraph(svg, initial_nodes, initial_links) {
 	update();
     }
 
-    this.addLink = function (source, target) {
+    this.addLink = function(source, target) {
 	links.push({"source":findNode(source),"target":findNode(target)});
 	update();
+    }
+
+    
+    this.addNeighbor = function(node, neighbor) {
+	// Create a new node called 'node'
+	// and add it as a neighbor to 'neighbor'
+	self.addNode(node);
+	self.addLink(neighbor, node.name);
     }
 
     // 
     // Private Implementation
     //
 
-    var w = svg[0][0].getAttribute("width");
-    var h = svg[0][0].getAttribute("height");
+    var w = 960; //svg[0][0].getAttribute("width");
+    var h = 700; //svg[0][0].getAttribute("height");
 
     var self = this;
 
@@ -69,8 +77,6 @@ function myGraph(svg, initial_nodes, initial_links) {
     }
 
     var begin = function() {
-	console.log("Begin");
-
 	
 	for(var i=0; i < initial_nodes.length; ++i) {
 	    nodes.push(initial_nodes[i]);
@@ -78,26 +84,11 @@ function myGraph(svg, initial_nodes, initial_links) {
 	for(var i=0; i < initial_links.length; ++i) {
 	    links.push(initial_links[i]);
 	}
-	/*
-	// Get the JSON
-	d3.json('/static/miserables.json', function(error, json) {
 
-	    for(var i=0; i < json.nodes.length; ++i) {
-		nodes.push(json.nodes[i]);
-	    }
-	    for(var i=0; i < json.links.length; ++i) {
-		links.push(json.links[i]);
-	    }
-
-	    // Now, update
-	    update();
-	});
-*/
 	update();
     }
 
     var update = function () {
-	console.log("Update");
 
 	// vis
         var link = svg.selectAll("line.link")
@@ -128,8 +119,10 @@ function myGraph(svg, initial_nodes, initial_links) {
 	nodeEnter.on("click", function(d) {
 	    var name = makename();
 	    var group = d.group;
-	    self.addNode(name, group);
-	    self.addLink(d.name, name);
+	    var node = {"name":name, "group":group}
+	    self.addNeighbor(node, d.name);
+	    //self.addNode(node);
+	    //self.addLink(d.name, name);
 	});
 	
 	//nodeEnter.on("mouseover", addLabel);
@@ -153,15 +146,3 @@ function myGraph(svg, initial_nodes, initial_links) {
     // Make it all go
     begin();
 }
-
-
-// set up the D3 visualisation in the specified element
-//var w = 960;
-//var h = 700;
-/*
-var svg = d3.select("body").append("svg:svg")
-    .attr("width", 960)
-    .attr("height", 700);
-
-graph = new myGraph(svg);
-*/
