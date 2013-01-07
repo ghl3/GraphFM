@@ -65,7 +65,6 @@ myGraph.prototype.findNode = function(name) {
     for (var i in this.nodes) {
 	if(this.nodes[i]["name"] === name) return this.nodes[i];
     }
-    console.log("Couldn't find node with name: " + name);
     return null;
 }
 
@@ -74,7 +73,6 @@ myGraph.prototype.findNodeIndex = function(name) {
     for (var i in this.nodes) {
 	if(this.nodes[i]["name"] === name) return i;
     }
-    console.log("Couldn't find node index with name: " + name);
     return null;
 }
 

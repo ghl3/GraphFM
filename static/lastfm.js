@@ -45,20 +45,33 @@ myGraph.prototype.on_click = function(node) {
 	var len = neighbours.user.length;
 	var idx = Math.floor(Math.random()*len);
 	var neighbor = neighbours.user[idx];
-	neighbor['group'] = node.group;
 	var link_length = Math.max(Math.ceil((neighbor.match-.99)*1000), 1.0);
 	console.log("Match: " + neighbor.match);
-	self.addNeighbor(node, neighbor, link_length);
+
+	var neighbor_url = lastfm.user_getinfo({"user" : neighbor.name});
+	d3.json(neighbor_url, function(error, json) {
+	    var neighbour_user = json.user;
+	    neighbour_user['group'] = node.group;
+	    self.addNeighbor(node, neighbour_user, link_length);
+	})
+	
+	//self.addNeighbor(node, neighbor, link_length);
 	
     });
 }
 
 myGraph.prototype.on_mouseover = function(node) {
     $("#selected_user_name").text(node.name);
+    $("#selected_real_name").text(node.realname);
+    $("#selected_age").text(node.age);
+    $("#selected_gender").text(node.gender);
 }
 
 myGraph.prototype.on_mouseout = function(node) {
     $("#selected_user_name").text('');
+    $("#selected_real_name").text('');
+    $("#selected_age").text('');
+    $("#selected_gender").text('');
 }
 
 
@@ -71,7 +84,11 @@ var add_user_node = function() {
     var user_name = $("#user_name").val();
     var group = Math.floor(Math.random()*10);
     console.log("Creating new user node for user: " + user_name);
-    graph.addNode( {"name" : user_name, "group" : group} );
+
+    var user_url = lastfm.user_getinfo({"user" : user_name});
+    d3.json(user_url, function(error, json) {
+	graph.addNode(json.user);
+    })
 }
 
 
