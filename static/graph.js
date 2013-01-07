@@ -4,6 +4,19 @@
 // and 
 // http://stackoverflow.com/questions/9539294/adding-new-nodes-to-force-directed-layout
 
+/*
+  This class implements a svg graph, which consists
+  of nodes and links and is held together using a
+  d3 'force.'
+
+  The nodes can be any objects, but they must contain
+  an attribute called 'name'.  Links are defined by
+  containing attributes 'source' and 'target' which
+  refer to the 'name' attributes of nodes that they
+  are connecting.
+
+*/
+
 function myGraph(svg, initial_nodes, initial_links) {
 
     // 
@@ -41,102 +54,10 @@ function myGraph(svg, initial_nodes, initial_links) {
 
     begin();
 
-    /*
-    var makename = function() {
-	var text = "";
-	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-	
-	for( var i=0; i < 5; i++ )
-	    text += possible.charAt(Math.floor(Math.random() * possible.length));
-	
-	return text;
-    }
-    */
-/*
-    var add_lastfm_neighbor = function(node) {
-
-	var neigh_url = "http://ws.audioscrobbler.com/2.0/?method=user.getneighbours";
-	neigh_url += "&user=" + node.name;
-	neigh_url += "&api_key=4ea86273090fac63525518c0a77465a4&format=json";
-	
-	d3.json(neigh_url, function(json) {
-	    console.log(json);
-
-	    // Pick a random neighbor to add
-	    var neighbours = json.neighbours;
-	    var len = neighbours.user.length;
-	    var idx = Math.floor(Math.random()*len);
-	    var neighbor = neighbours.user[idx];
-	    console.log("Match: " + neighbor.match);
-	    self.addNeighbor(node, neighbor, link_length(neighbor.match));
-	    
-	});
-    }
-*/
-
-/*
-    var update = function () {
-
-	// vis
-        var link = svg.selectAll("line.link")
-            .data(self.links, function(d) { return d.source.name + "-" + d.target.name; });
-
-        link.enter().insert("line")
-            .attr("class", "link")
-	    .style("stroke-width", function(d) { return Math.sqrt(d.value); });
-
-        link.exit().remove();
-
-	// vis
-        var node = svg.selectAll("g.node")
-            .data(self.nodes, function(d) { return d.name;});
-
-        var nodeEnter = node.enter().append("g")
-            .attr("class", "node")
-            .call(force.drag);
-
-        nodeEnter.append("circle")
-            .attr("class", "circle")
-            .attr("r", 10)
-            .style("fill", function(d) { return color(d.group); })
-	    .append("svg:title")
-	    .text(function(d) { return d.name; });
-
-	// Make the ability to add new nodes
-	// by clicking
-	nodeEnter.on("click", function(d) {
-	    self.on_click(d);
-	});
-	
-	nodeEnter.on("mouseover", function(d) {
-	    self.on_mouseover(d);
-	});
-
-	nodeEnter.on("mouseout", function(d){
-	    self.on_mouseout(d);
-	});
-
-        node.exit().remove();
-
-        force.on("tick", function() {
-	    link.attr("x1", function(d) { return d.source.x; })
-		.attr("y1", function(d) { return d.source.y; })
-		.attr("x2", function(d) { return d.target.x; })
-		.attr("y2", function(d) { return d.target.y; });
-
-	    node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
-	});
-
-        // Restart the force layout.
-        force.start();
-    }.bind(self);
-*/
-    // Make it all go
-
 }
 
 //
-// Private implementation
+// Methods
 //
 
 
@@ -144,18 +65,16 @@ myGraph.prototype.findNode = function(name) {
     for (var i in this.nodes) {if (this.nodes[i]["name"] === name) return this.nodes[i]};
 }
 
+
 myGraph.prototype.findNodeIndex = function(name) {
     for (var i in this.nodes) {if (this.nodes[i]["name"] === name) return i};
 }
-
-
 
 
 myGraph.prototype.update = function () {
 
     self = this;
 
-    // vis
     var link = this.svg.selectAll("line.link")
         .data(self.links, function(d) { return d.source.name + "-" + d.target.name; });
 
@@ -165,7 +84,6 @@ myGraph.prototype.update = function () {
 
     link.exit().remove();
 
-    // vis
     var node = this.svg.selectAll("g.node")
         .data(self.nodes, function(d) { return d.name;});
 
@@ -180,8 +98,7 @@ myGraph.prototype.update = function () {
 	.append("svg:title")
 	.text(function(d) { return d.name; });
 
-    // Make the ability to add new nodes
-    // by clicking
+    // Make the ability to add new nodes by clicking
     nodeEnter.on("click", function(d) {
 	self.on_click(d);
     });
@@ -210,18 +127,11 @@ myGraph.prototype.update = function () {
 }
 
 
-
-//
-// Public API
-//
-
-// Add and remove elements on the graph object
 myGraph.prototype.addNode = function(node) {
-    console.log("addNode");
-    console.log(this.nodes);
     this.nodes.push(node);
     this.update();
 }
+
 
 myGraph.prototype.removeNode = function(name) {
     var i = 0;
@@ -234,6 +144,7 @@ myGraph.prototype.removeNode = function(name) {
     update();
 }
 
+
 myGraph.prototype.addLink = function(source, target, value) {
     if( value==null ) value = 1.0;
     this.links.push({"source" : this.findNode(source), 
@@ -242,20 +153,18 @@ myGraph.prototype.addLink = function(source, target, value) {
     this.update();
 }
 
+
 myGraph.prototype.addNeighbor = function(node, neighbor, value) {
-
-    self = this;
-
-    // Add 'neighbor' as a neighbor to 'node'
-    console.log("Adding neighbor: " + neighbor.name);
-    console.log("To node: " + node.name);
-    console.log("with value: " + value);
-    self.addNode(neighbor);
-    self.addLink(neighbor.name, node.name, value);
+    this.addNode(neighbor);
+    this.addLink(neighbor.name, node.name, value);
 }
 
 
-// These methods can be implemented
+//
+// These methods should be implemented by the user
+// Consider them 'virtual'
+//
+
 
 myGraph.prototype.on_click = function() { 
     console.log("Click");
