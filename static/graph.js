@@ -166,7 +166,6 @@ myGraph.prototype.addNeighbor = function(node, neighbor, value) {
     // Add the node if it doesn't exist
     // Otherwise, only add the link
     if( this.findNode(neighbor.name) == null ) {
-	console.log("Creating neighbor: must add new node: " + node);
 	this.addNode(neighbor);
     }
     this.addLink(neighbor.name, node.name, value);
@@ -189,14 +188,14 @@ myGraph.prototype.reset = function() {
 
 
 myGraph.prototype.on_click = function() { 
-    console.log("Click");
+    return;
 }
     
 myGraph.prototype.on_mouseover = function() { 
-    console.log("Mouse Over");
+    return;
 }
 
 myGraph.prototype.on_mouseout = function() { 
-    console.log("Mouse Out");
+    return;
 }
 
