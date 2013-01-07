@@ -16,25 +16,10 @@
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <script type="text/javascript" src="/static/graph.js"></script>
     <script type="text/javascript" src="/static/lastfm.js"></script>
-<!--
-    <script>
-      function load() {
-      
-      var svg = d3.select("#graph").append("svg:svg")
-      .attr("width", 960)
-      .attr("height", 700);
 
-      d3.json('/static/miserables.json', function(error, json) {
-
-      graph = new myGraph(svg, json.nodes, json.links);
-      })
-      }
-    </script>
--->
   </head>
 
-  <!--<body bgcolor="black">-->
-  <body onload="load()">
+  <body >
     <div id="header" bgcolor="black">
       <h1>LastFM Graph</h1><br/>
       <p class="control_panel"> <!--<img src="potential.png" width="100%" />--> <br/><br/></p>
