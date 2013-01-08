@@ -24,9 +24,6 @@
       <h1>LastFM Graph</h1><br/>
       <p class="control_panel">
 
-      <input type="button" id="reset" value="Reset" onClick="reset();"
-	     style="margin-bottom: 20px"/> <br>
-
       <table cellpadding=1 cellspacing=10 width="100%" class="control_panel">
 
         <!-- Disk -->
@@ -36,11 +33,21 @@
 
         <tr>
           <td class="label">User Name:</td>
-          <td><input type="text" id="user_name" value="" size=10 /></td>
+          <td><input type="text" id="user_name" value="" size=12 /></td>
         </tr>
-	<tr><input type="button" id="add_user_node" value="Add User Node" onClick="add_user_node();" />
+	<tr>
+	  <td></td>
+	  <td>
+	    <input type="button" id="add_user_node" value="Add User Node" onClick="add_user_node();" />
+	  </td>
 	</tr>
-
+	<tr>
+	  <td></td>
+	  <td>
+	    <input type="button" id="reset" value="Clear All" onClick="reset();" />
+	  </td>
+	</tr>
+	
 	<tr>
 	  <td class="label"> Clicking on nodes: </td>
 	  <td> 
