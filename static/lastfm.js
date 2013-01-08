@@ -60,12 +60,18 @@ myGraph.prototype.add_lastfm_neighbor = function(node) {
     var self = this;
 
     var neigh_url = lastfm.user_getneighbours({"user" : node.name});
-    d3.json(neigh_url, function(json) {
+    $.getJSON(neigh_url, function(json) {
 
 	// Add the nearest neighbor that hasn't
 	// already been added
 	var neighbour = null;
 	var neighbours = json.neighbours.user;
+	if( ! $.isArray(neighbours) || neighbours.length == 0 ) {
+	    console.log("No new neighbours found");
+	    return;
+	}
+	console.log("neighbours:");
+	console.log(neighbours);
 	neighbours.sort(function(a,b) { return a.match - b.match;}); //neighbor
 	for(var idx=0; idx < neighbours.length; ++idx) {
 	    if(self.findNode(neighbours[idx].name) == null){
@@ -84,7 +90,7 @@ myGraph.prototype.add_lastfm_neighbor = function(node) {
 	// more info about that neighbor
 	var link_length = Math.max(Math.ceil((neighbour.match-.99)*1000), 1.0);
 	var neighbour_url = lastfm.user_getinfo({"user" : neighbour.name});
-	d3.json(neighbour_url, function(error, json) {
+	$.getJSON(neighbour_url, function(json) {
 	    if( json.error != null ) {
 		console.log("No User Found with name: " + neighbour.name);
 		return;
@@ -93,8 +99,8 @@ myGraph.prototype.add_lastfm_neighbor = function(node) {
 	    neighbour_user['group'] = node.group;
 	    self.addNeighbor(node, neighbour_user, link_length);
 	    select_node(neighbour_user);
-	})
-    });
+	}).error(function() { console.log("Failed to get: " + neighbour_url); })
+    }).error(function() { console.log("Failed to get: " + neigh_url); })
 }
 
 myGraph.prototype.on_mouseover = function(node) {
@@ -115,16 +121,17 @@ var add_user_node = function() {
     console.log("Creating new user node for user: " + user_name);
 
     var user_url = lastfm.user_getinfo({"user" : user_name});
-    d3.json(user_url, function(error, json) {
+    $.getJSON(user_url, function(json) {
 	if( json.error != null ) {
 	    console.log("No User Found with name: " + user_name);
 	    return;
 	}
+	console.log(json);
 	var neighbour_user = json.user;
 	neighbour_user["group"] = group;
 	graph.addNode(json.user);
 	select_node(json.user);
-    })
+    }).error(function() { console.log("Failed to get: " + user_url); })
 }
 
 var select_node = function(node) {
@@ -138,7 +145,7 @@ var select_node = function(node) {
     // Display the top artists of the
     // user associated with the given node
     var top_url = lastfm.user_gettopartists({"user" : node.name, "limit" : 5});
-    d3.json(top_url, function(json) {
+    $.getJSON(top_url, function(json) {
 	var artist_array = json.topartists.artist;
 	if( artist_array.length != 0 ) {
 	    $('#top_artists').empty();
@@ -150,7 +157,7 @@ var select_node = function(node) {
 	    }
 	    $('#top_artists').append(table);
 	}
-    })
+    }).error(function() { console.log("Failed to get: " + top_url); })
 } 
 
 var deselect_node = function() {
@@ -168,15 +175,5 @@ $(document).ready(function() {
 	.attr("height", 700);
 
     graph = new myGraph(svg, new Array(), new Array());
-    // Initialize the graph with the selected user
-    /*
-    var user_url = lastfm.user_getinfo({"user" : "rj"});
-    d3.json(user_url, function(error, json) {
-	var user = json.user;
-	var group = Math.floor(Math.random()*10);
-	user["group"] = group;
-	graph = new myGraph(svg, new Array(user), new Array());
-	console.log("Successfully made graph");
-    })
-    */
+
 });

@@ -60,7 +60,6 @@ function myGraph(svg, initial_nodes, initial_links) {
 // Methods
 //
 
-
 myGraph.prototype.findNode = function(name) {
     for (var i in this.nodes) {
 	if(this.nodes[i]["name"] === name) return this.nodes[i];
@@ -166,6 +165,7 @@ myGraph.prototype.addNeighbor = function(node, neighbor, value) {
     // Add the node if it doesn't exist
     // Otherwise, only add the link
     if( this.findNode(neighbor.name) == null ) {
+	//this.nodes.push(neighbor);
 	this.addNode(neighbor);
     }
     this.addLink(neighbor.name, node.name, value);
@@ -185,7 +185,6 @@ myGraph.prototype.reset = function() {
 // These methods should be implemented by the user
 // Consider them 'virtual'
 //
-
 
 myGraph.prototype.on_click = function() { 
     return;
