@@ -121,6 +121,7 @@ var add_user_node = function() {
 	    return;
 	}
 	var neighbour_user = json.user;
+	neighbour_user["group"] = group;
 	graph.addNode(json.user);
 	select_node(json.user);
     })
@@ -139,14 +140,16 @@ var select_node = function(node) {
     var top_url = lastfm.user_gettopartists({"user" : node.name, "limit" : 5});
     d3.json(top_url, function(json) {
 	var artist_array = json.topartists.artist;
-	$('#top_artists').empty();
-	var table = $('<table style="text-align: center;"></table>').addClass('control_panel');
-	table.append('<tr><td class="label" style="text-align: center;" >Top Artists</td></tr>');
-	for(var i=0; i<5; i++){
-	    var row = $('<tr></tr>').addClass('bar').text(artist_array[i].name);
-	    table.append(row);
+	if( artist_array.length != 0 ) {
+	    $('#top_artists').empty();
+	    var table = $('<table style="text-align: center;"></table>').addClass('control_panel');
+	    table.append('<tr><td class="label" style="text-align: center;">Top Artists</td></tr>');
+	    for(var i=0; i<artist_array.length; i++){
+		var row = $('<tr></tr>').addClass('bar').text(artist_array[i].name);
+		table.append(row);
+	    }
+	    $('#top_artists').append(table);
 	}
-	$('#top_artists').append(table);
     })
 } 
 
