@@ -3,7 +3,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 
-    <title>LastFM Graph</title>
+    <title>GraphFM</title>
 
     <!-- Style / css -->
     <link href="http://fonts.googleapis.com/css?family=Carrois+Gothic" rel="stylesheet" type="text/css">
@@ -20,85 +20,80 @@
   </head>
 
   <body >
+
     <div id="header" bgcolor="black">
-      <h1>LastFM Graph</h1><br/>
+
+      <h1>GraphFM</h1>
+
       <p class="control_panel">
 
-      <table cellpadding=1 cellspacing=10 width="100%" class="control_panel">
+	<table cellpadding=1 cellspacing=10 width="100%" class="control_panel">
+          <tr>
+            <td class="component_name" colspan=2></td>
+          </tr>
 
-        <!-- Disk -->
-        <tr>
-          <td class="component_name" colspan=2></td>
-        </tr>
-
-        <tr>
-          <td class="label">User Name:</td>
-          <td><input type="text" id="user_name" value="" size=12 /></td>
-        </tr>
-	<tr>
-	  <td></td>
-	  <td>
-	    <input type="button" id="add_user_node" value="Add User Node" onClick="add_user_node();" />
-	  </td>
-	</tr>
-	<tr>
-	  <td></td>
-	  <td>
-	    <input type="button" id="reset" value="Clear All" onClick="reset();" />
-	  </td>
-	</tr>
-	
-	<tr>
-	  <td class="label"> Clicking on nodes: </td>
-	  <td> 
-
-	    <label>
-	      <input type="radio" name="click_action" value="select_node" checked="checked">Select Node
-	    </label>
-	    <br>
-	    <label>
-	      <input type="radio" name="click_action" value="neighbor">Gets Neighbor
-	    </label> 
+          <tr>
+            <td class="label">User Name:</td>
+            <td><input type="text" id="user_name" value="" size=12 /></td>
+          </tr>
+	  <tr>
+	    <td></td>
+	    <td>
+	      <input type="button" id="add_user_node" value="Add User Node" onClick="add_user_node();" />
 	    </td>
-	</tr>
+	  </tr>
+	  <tr>
+	    <td></td>
+	    <td>
+	      <input type="button" id="reset" value="Clear All" onClick="reset();" />
+	    </td>
+	  </tr>
+	  
+	  <tr>
+	    <td class="label"> Clicking on nodes: </td>
+	    <td> 
 
-        <!-- Selected User -->
-        <tr>
-          <td class="component_name" colspan=2>Selected User</td>
-        </tr>
-        <tr>
-          <td class="label">User Name:</td>
-          <td class="text" id="selected_user_name"></td>
-        </tr>
-        <tr>
-          <td class="label">Real Name:</td>
-          <td class="text" id="selected_real_name"></td>
-        </tr>
-        <tr>
-          <td class="label">Age:</td>
-          <td class="text" id="selected_age"></td>
-        </tr>
-        <tr>
-          <td class="label">Gender:</td>
-          <td class="text" id="selected_gender"></td>
-        </tr>
+	      <label>
+		<input type="radio" name="click_action" value="select_node" checked="checked">Select Node
+	      </label>
+	      <br>
+	      <label>
+		<input type="radio" name="click_action" value="neighbor">Gets Neighbor
+	      </label> 
+	    </td>
+	  </tr>
 
-        <tr>
-          <td colspan=2></td>
-        </tr>
-        <tr><td colspan="2"><br/></td></tr>
-      </table>
+          <!-- Selected User -->
+          <tr>
+            <td class="component_name" colspan=2>Selected User</td>
+          </tr>
+          <tr>
+            <td class="label">User Name:</td>
+            <td class="text" id="selected_user_name"></td>
+          </tr>
+          <tr>
+            <td class="label">Real Name:</td>
+            <td class="text" id="selected_real_name"></td>
+          </tr>
+          <tr>
+            <td class="label">Age:</td>
+            <td class="text" id="selected_age"></td>
+          </tr>
+          <tr>
+            <td class="label">Gender:</td>
+            <td class="text" id="selected_gender"></td>
+          </tr>
 
-      <div id="top_artists">
-      </div>
+          <tr><td colspan="2"></td></tr>
+	</table>
+	
+	<div id="top_artists"></div>
 
-    </div>
+    </div> <!-- header -->
 
     <div id="graph" style="margin-left: 300px; height: 700px;"></div>
-
-    <div id="footer">
-      George Herbert Lewis</a>
-    </div>
+    <div id="footer"> George Herbert Lewis</div>
+    
   </body>
-
+  
 </html>
